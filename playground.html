@@ -1,1 +1,5 @@
 <script type="text/javascript" src="dist/bundle.js"></script>
+<script>
+/* global evemitter */
+window.eve = evemitter.connect('127.0.01', 9912, 'test', '123456')
+</script>

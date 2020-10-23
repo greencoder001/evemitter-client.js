@@ -6,7 +6,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-/* global Operation, zGET, waitFor */
+/* global Operation, zGET, waitFor, btoa */
 
 /* Start Load Dependencies */
 if (typeof Operation === 'undefined' || typeof waitFor === 'undefined' || typeof zGET === 'undefined') {
@@ -41,6 +41,7 @@ var evemitter = {
       this.port = port;
       this.ip = ip;
       this.generateHost();
+      this.uri = "".concat(this.host).concat(this.login.user, "/").concat(this.login.pwd, "/");
     }
 
     _createClass(Evemitter, [{
@@ -62,6 +63,24 @@ var evemitter = {
       key: "generateHost",
       value: function generateHost() {
         this.host = "https://".concat(this.ip, ":").concat(this.port, "/");
+      } // Real functions:
+
+    }, {
+      key: "call",
+      value: function call(id, value) {
+        var encrypted = btoa(value);
+        return zGET({
+          url: "".concat(this.uri, "call/").concat(id, "/").concat(encrypted)
+        });
+      }
+    }, {
+      key: "onCall",
+      value: function onCall(id, callBack) {
+        if (typeof callBack !== 'function') throw new TypeError('callBack must be a function'); // Is CallBack valid?
+
+        var callsRequest = zGET({
+          url: this.uri + 'calls'
+        });
       }
     }]);
 

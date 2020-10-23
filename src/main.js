@@ -1,4 +1,4 @@
-/* global Operation, zGET, waitFor */
+/* global Operation, zGET, waitFor, btoa */
 
 /* Start Load Dependencies */
 if (typeof Operation === 'undefined' || typeof waitFor === 'undefined' || typeof zGET === 'undefined') {
@@ -25,6 +25,7 @@ const evemitter = {
       this.port = port
       this.ip = ip
       this.generateHost()
+      this.uri = `${this.host}${this.login.user}/${this.login.pwd}/`
     }
 
     ping () {
@@ -41,6 +42,20 @@ const evemitter = {
 
     generateHost () {
       this.host = `https://${this.ip}:${this.port}/`
+    }
+
+    // Real functions:
+
+    call (id, value) {
+      const encrypted = btoa(value)
+
+      return zGET({ url: `${this.uri}call/${id}/${encrypted}` })
+    }
+
+    onCall (id, callBack) {
+      if (typeof callBack !== 'function') throw new TypeError('callBack must be a function') // Is CallBack valid?
+
+      const callsRequest = zGET({ url: this.uri + 'calls' })
     }
   }
 }
