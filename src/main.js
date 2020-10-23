@@ -56,6 +56,10 @@ const evemitter = {
       if (typeof callBack !== 'function') throw new TypeError('callBack must be a function') // Is CallBack valid?
 
       const callsRequest = zGET({ url: this.uri + 'calls' })
+
+      waitFor(callsRequest, () => {
+        
+      })
     }
   }
 }
