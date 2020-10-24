@@ -43,12 +43,16 @@ var evemitter = {
     var port = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 9912;
     var user = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'evemitter';
     var pwd = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
-    return new evemitter.Evemitter(host, port, user, pwd);
+    var interval = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 500;
+    return new evemitter.Evemitter(host, port, user, pwd, interval);
   },
   Evemitter: /*#__PURE__*/function () {
     function Evemitter(ip, port, user, pwd) {
+      var interval = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 500;
+
       _classCallCheck(this, Evemitter);
 
+      this.interval = interval;
       this.lastProcessedCall = 0;
       this.connection = null;
       this.login = {
@@ -158,7 +162,7 @@ var evemitter = {
           }
         }
 
-        setInterval(gCalls, 500);
+        setInterval(gCalls, this.interval);
       }
     }, {
       key: "onCall",
