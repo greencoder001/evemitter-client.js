@@ -19,13 +19,18 @@ const evemitter = {
   },
   Evemitter: class Evemitter {
     constructor (ip, port, user, pwd) {
+      this.lastProcessedCall = 0
       this.connection = null
       this.login = { user, pwd }
+
+      this.callHandlers = {}
 
       this.port = port
       this.ip = ip
       this.generateHost()
       this.uri = `${this.host}${this.login.user}/${this.login.pwd}/`
+
+      this.gcS()
     }
 
     ping () {
@@ -52,14 +57,48 @@ const evemitter = {
       return zGET({ url: `${this.uri}call/${id}/${encrypted}` })
     }
 
-    onCall (id, callBack) {
+    getCalls (cid, callBack) {
       if (typeof callBack !== 'function') throw new TypeError('callBack must be a function') // Is CallBack valid?
+      cid = `${cid}`
 
       const callsRequest = zGET({ url: this.uri + 'calls' })
 
-      waitFor(callsRequest, () => {
-        
+      waitFor(callsRequest, (value) => {
+        const calls = JSON.parse(value)
+
+        for (const { callID, timeStamp, owner, callMsg } of calls) {
+          if (cid === callID || cid === '*') {
+            callBack({
+              timestamp: timeStamp,
+              owner,
+              id: callID,
+              msg: callMsg
+            })
+          }
+        }
       })
+    }
+
+    gcS () {
+      const p = this
+
+      function gCalls () {
+        for (const [key, values] of Object.entries(p.callHandlers)) {
+          for (const callHandler of values) {
+            p.getCalls(key, callHandler)
+          }
+        }
+      }
+
+      setInterval(gCalls, 500)
+    }
+
+    onCall (callID = '*', callBack = console.log) {
+      if (typeof callBack !== 'function') throw new TypeError('callBack must be a function') // Is CallBack valid?
+      callID = `${callID}`
+      this.callHandlers[callID] = typeof this.callHandlers[callID] !== 'object' /* array */ ? [] : this.callHandlers[callID]
+
+      this.callHandlers[callID].push(callBack)
     }
   }
 }
