@@ -14,11 +14,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // Real Script:
 const evemitter = {
-  connect: (host = '127.0.0.1', port = 9912, user = 'evemitter', pwd = '') => {
-    return new evemitter.Evemitter(host, port, user, pwd)
+  connect: (host = '127.0.0.1', port = 9912, user = 'evemitter', pwd = '', interval = 500) => {
+    return new evemitter.Evemitter(host, port, user, pwd, interval)
   },
   Evemitter: class Evemitter {
-    constructor (ip, port, user, pwd) {
+    constructor (ip, port, user, pwd, interval = 500) {
+      this.interval = interval
       this.lastProcessedCall = 0
       this.connection = null
       this.login = { user, pwd }
@@ -90,7 +91,7 @@ const evemitter = {
         }
       }
 
-      setInterval(gCalls, 500)
+      setInterval(gCalls, this.interval)
     }
 
     onCall (callID = '*', callBack = console.log) {
